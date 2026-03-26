@@ -5,7 +5,7 @@
 ;; Author: Vedang Manerikar <@vedang>
 ;; Maintainer: Vedang Manerikar <@vedang>
 ;; Version: 0.1.0
-;; Package-Requires: ((emacs "28.1"))
+;; Package-Requires: ((emacs "28.1") (projectile "2.0.0"))
 ;; Keywords: tools, convenience
 ;; Homepage: https://github.com/vedang/tagref.el
 
@@ -42,7 +42,7 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'project)
+(require 'projectile)
 (require 'xref)
 (require 'compile)
 (require 'tabulated-list)
@@ -87,8 +87,7 @@
 
 (defun tagref--project-root ()
   "Return the project root directory for the current buffer."
-  (when-let ((proj (project-current)))
-    (project-root proj)))
+  (projectile-project-root))
 
 (defun tagref--in-enabled-project-p ()
   "Return non-nil if current buffer is in a tagref-enabled project."
@@ -562,8 +561,7 @@ for all buffers in the current project."
   (if tagref-mode
       (if (tagref--project-root)
           (tagref--enable-in-project)
-        (setq tagref-mode nil)
-        (user-error "Not in a project; tagref-mode requires project.el"))
+        (setq tagref-mode nil))
     (tagref--disable-in-project)))
 
 (provide 'tagref)
