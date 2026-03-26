@@ -112,11 +112,12 @@
 (defun tagref--call-process (&rest args)
   "Call tagref with ARGS and return output as string.
 Returns nil if tagref fails or if not in a project."
-  (when-let ((root (tagref--project-root)))
+  (when-let* ((root (tagref--project-root))
+              (exe (executable-find tagref-executable)))
     (let ((default-directory root))
       (with-temp-buffer
         (let ((exit-code (apply #'call-process
-                                tagref-executable
+                                exe
                                 nil t nil
                                 (append tagref-arguments args))))
           (when (zerop exit-code)
