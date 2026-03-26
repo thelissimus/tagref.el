@@ -231,8 +231,9 @@ Returns nil if not inside a directive."
 ;;;; Xref Backend
 
 (defun tagref--xref-backend ()
-  "Return the tagref xref backend if in an enabled project."
-  (when (tagref--in-enabled-project-p)
+  "Return the tagref xref backend if point is on a tagref directive."
+  (when (and (tagref--in-enabled-project-p)
+             (tagref--identifier-at-point))
     'tagref))
 
 (defun tagref--parse-directive-at-point ()
@@ -507,7 +508,7 @@ The resulting buffer supports `next-error' navigation."
     (tagref--enable-font-lock)
     ;; Add completion and xref hooks
     (add-hook 'completion-at-point-functions #'tagref-completion-at-point -90 t)
-    (add-hook 'xref-backend-functions #'tagref--xref-backend nil t)))
+    (add-hook 'xref-backend-functions #'tagref--xref-backend -100 t)))
 
 (defun tagref--disable-in-buffer ()
   "Disable tagref features in the current buffer."
