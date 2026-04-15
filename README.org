@@ -5,15 +5,14 @@
 Emacs integration for [[https://github.com/stepchowfun/tagref][tagref]], a tool for managing cross-references in
 code.
 
-* Overview
+This is a fork of [[https://github.com/vedang/tagref.el][vedang/tagref.el]] with these changes:
+- Uses [[https://github.com/bbatsov/projectile][projectile]] instead of =project.el=
+- Fixes xref backend priority so =tagref.el= handles directives inside comments to prevent clash with eglot
+- Locates the tagref executable on demand (devshell/[[https://github.com/purcell/envrc][envrc]] friendly)
 
-Tagref helps you maintain cross-references in your codebase using
-simple tags:
+I have no plans to upstream these changes.
 
-- =[tag:name]= defines a tag
-- =[ref:name]= references a tag
-
-This package provides Emacs support for working with these directives:
+* Features
 
 - *Completion* for =[ref:]= and =[tag:]= with existing tag names
 - *Navigation* via =M-.= to jump from a reference to its tag
@@ -28,7 +27,8 @@ This package provides Emacs support for working with these directives:
 ** Requirements
 
 - Emacs 28.1 or later
-- [[https://github.com/stepchowfun/tagref][tagref]] CLI installed and available in your =PATH=
+- [[https://github.com/bbatsov/projectile][projectile]]
+- [[https://github.com/stepchowfun/tagref][tagref]]
 
 ** Manual Installation
 
@@ -41,7 +41,7 @@ This package provides Emacs support for working with these directives:
 
 #+begin_src emacs-lisp
 (use-package tagref
-  :ensure t
+  :vc (:url "https://github.com/thelissimus/tagref.el")
   :hook (prog-mode . tagref-mode))
 #+end_src
 
@@ -51,7 +51,29 @@ This package provides Emacs support for working with these directives:
 (straight-use-package
  '(tagref :type git
           :host github
-          :repo "vedang/tagref.el"))
+          :repo "thelissimus/tagref.el"))
+#+end_src
+
+** Nix (home-manager)
+
+#+begin_src nix
+programs.emacs = {
+  enable = true;
+  extraPackages = epkgs: with epkgs; [
+    projectile
+    (trivialBuild {
+      pname = "tagref";
+      version = "0c805b2cf31477ea3d99cd9758c78b0ef1f6d35a";
+      src = pkgs.fetchFromGitHub {
+        owner = "thelissimus";
+        repo = "tagref.el";
+        rev = "0c805b2cf31477ea3d99cd9758c78b0ef1f6d35a";
+        hash = "sha256-i2A/spHEkxCXvXGUXOyiuiJz2dosikiLZ85cYzvh1+8=";
+      };
+      packageRequires = [ projectile ];
+    })
+  ];
+};
 #+end_src
 
 * Usage
@@ -64,7 +86,7 @@ Enable =tagref-mode= in any buffer:
 M-x tagref-mode
 #+end_example
 
-=tagref-mode= understands projects as defined by =project.el= and will
+=tagref-mode= understands projects as defined by =projectile= and will
 be turned on for all buffers of that project.
 
 ** Completion
@@ -153,8 +175,6 @@ tag_sigil_default                        src/main.rs                            
 
 * Configuration
 
-** Custom Variables
-
 #+begin_src emacs-lisp
 ;; Path to tagref executable (default: "tagref")
 (setq tagref-executable "/path/to/tagref")
@@ -162,20 +182,6 @@ tag_sigil_default                        src/main.rs                            
 ;; Additional arguments for tagref commands
 (setq tagref-arguments '("--config" "custom.toml"))
 #+end_src
-
-** Customization Interface
-
-#+begin_example
-M-x customize-group RET tagref RET
-#+end_example
-
-* Commands
-
-| Command             | Description                                      |
-|---------------------+--------------------------------------------------|
-| =tagref-mode=       | Toggle tagref minor mode for the current project |
-| =tagref-check=      | Run tagref validation, show errors               |
-| =tagref-list-tags=  | Display all tags in a browsable buffer           |
 
 * Development
 
@@ -186,16 +192,6 @@ make test    # Run Buttercup test suite
 make check   # Run byte-compile, checkdoc, package-lint
 make all     # Run everything
 #+end_src
-
-** Project Structure
-
-#+begin_example
-├── Makefile           # Build and test commands
-├── README.org         # This file
-├── tagref.el          # Main package
-└── test/
-    └── tagref-test.el # Buttercup tests
-#+end_example
 
 * Troubleshooting
 
