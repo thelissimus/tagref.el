@@ -1,13 +1,14 @@
 ;;; tagref.el --- Tagref cross-reference support -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2026 Vedang Manerikar
+;; Copyright (C) 2026 thelissimus
 
 ;; Author: Vedang Manerikar <@vedang>
-;; Maintainer: Vedang Manerikar <@vedang>
-;; Version: 0.1.0
+;; Maintainer: thelissimus <@thelissimus>
+;; Version: 0.2.0
 ;; Package-Requires: ((emacs "28.1") (projectile "2.0.0"))
 ;; Keywords: tools, convenience
-;; Homepage: https://github.com/vedang/tagref.el
+;; Homepage: https://github.com/thelissimus/tagref.el
 
 ;; This file is not part of GNU Emacs.
 
@@ -38,6 +39,12 @@
 ;;
 ;; The mode is project-aware: enabling `tagref-mode' activates tagref
 ;; features for all buffers in the current project.
+;;
+;; This is a fork of vedang/tagref.el with these changes:
+;; - Uses projectile instead of project.el
+;; - Fixes xref backend priority so tagref.el handles directives inside comments
+;;   to prevent clash with eglot
+;; - Locates the tagref executable on demand (devshell/envrc friendly)
 
 ;;; Code:
 
